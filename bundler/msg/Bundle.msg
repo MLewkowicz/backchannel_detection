@@ -1,3 +1,3 @@
 std_msgs/Header header
-audio_features/AudioFeatures audio
-audio_features/AudioFeatures nod
+audio_features_detection/AudioFeatures audio
+nod_detection/NodFeatures nod

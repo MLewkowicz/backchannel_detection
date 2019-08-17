@@ -6,8 +6,9 @@ import rosbag
 import rospy
 from rospywrapper import BagSource, TopicSource, TopicSink, BagSink
 
-from audio_io_msgs.msg import AudioData
-from audio_features.msg import AudioFeatures
+#from audio_io_msgs.msg import AudioData
+from ros_speech2text.msg import AudioChunk
+from audio_features_detection.msg import AudioFeatures
 from std_msgs.msg import Header, Time, Int32
 
 def width_to_dtype(width):
@@ -23,22 +24,22 @@ def width_to_dtype(width):
 
 def get_configuration():
 	# Get topic parameters
-	audio_topic = rospy.get_param('~audio_topic')
-	start_time_topic = rospy.get_param('~start_time_topic', '/bc/start_time')
-	window_duration_topic = rospy.get_param('~window_duration_topic', '/bc/window_duration')
-	features_topic = rospy.get_param('~features_topic', '/bc/audio_features')
+	audio_topic = rospy.get_param('audio_topic', '/pid1/chunk')
+	start_time_topic = rospy.get_param('start_time_topic', '/bc/start_time')
+	window_duration_topic = rospy.get_param('window_duration_topic', '/bc/window_duration')
+	features_topic = rospy.get_param('features_topic', '/bc/audio_features')
 
 	# Get source, sink parameters
-	src_bag_path = rospy.get_param('~source_bag_path', None)
-	sink_bag_path = rospy.get_param('~sink_bag_path', None)
+	src_bag_path = rospy.get_param('source_bag_path', None)
+	sink_bag_path = rospy.get_param('sink_bag_path', None)
 
 	# Instantiate sources
 	if src_bag_path:
-		audio_src = BagSource(src_bag_path, audio_topic)
+		audio_source = BagSource(src_bag_path, audio_topic)
 		start_time_src = BagSource(src_bag_path, start_time_topic)
 		window_duration_src = BagSource(src_bag_path, window_duration_topic)
 	else:
-		audio_src = TopicSource(audio_topic, AudioData)
+		audio_source = TopicSource(audio_topic, AudioChunk)
 		start_time_src = TopicSource(start_time_topic, Time)
 		window_duration_src = TopicSource(window_duration_topic, Int32)
 
@@ -62,32 +63,37 @@ def get_configuration():
 		window_duration = rospy.Duration(msg.data / 1000.)
 	rospy.loginfo('Found start time, window duration.')
 
-	return (bag, audio_src, features_sink, start_time, window_duration)
+	return (bag, audio_source, features_sink, start_time, window_duration)
 
 def main():
 	(bag, audio_source, features_sink, start_time, window_duration) = get_configuration()
 	combiner = grouper.Combiner(start_time, window_duration, ['mean', 'meme'])
 	windows = grouper.Window(start_time, window_duration)
-	with conditional(bag, bag):
-		with audio_source, features_sink:
-			for msg, t in audio_source:
-				if msg.num_channels != 1:
-					raise Exception('Only single channel (mono) audio is accepted.')
-				if not msg.data:
-					continue
-				dtype = width_to_dtype(msg.sample_width)
-				data = np.fromstring(msg.data, dtype)
-				m = np.mean(data)
-				windows.put(m, t, t + rospy.Duration(float(len(data)) / msg.sample_rate))
-				for window, start, end in windows:
-					combiner.put('mean', np.mean(window), start, end)
-					combiner.put('meme', True, start, end)
-				for bundle, start, end in combiner:
-					msg = bundle
-					h = Header()
-					h.stamp = start
-					bundle['header'] = h
-					features_sink.put(bundle, start)
+	
+	#with conditional(bag, bag):
+	with audio_source, features_sink:
+		for msg, t in audio_source:
+			
+			# if msg.num_channels != 1:
+			# 	raise Exception('Only single channel (mono) audio is accepted.')
+			# if not msg.data:
+			# 	continue
+			# dtype = width_to_dtype(msg.sample_width)
+			# data = np.fromstring(msg.data, dtype)
+			# m = np.mean(data)
+			# windows.put(m, t, t + rospy.Duration(float(len(data)) / msg.sample_rate))
+			windows.put(msg.index, t, t + rospy.Duration(1./30)) 
+			for window, start, end in windows:
+				
+				combiner.put('mean', 1.0, start, end)
+				combiner.put('meme', True, start, end)
+			for bundle, start, end in combiner:
+				
+				msg = bundle
+				h = Header()
+				h.stamp = start
+				bundle['header'] = h
+				features_sink.put(bundle, start)
 			# features = compute_audio_features(audio, start_time)
 
 if __name__ == '__main__':

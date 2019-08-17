@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(audio_features)
+project(audio_features_detection)
 
 find_package(catkin REQUIRED
   COMPONENTS

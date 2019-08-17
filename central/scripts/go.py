@@ -6,12 +6,13 @@ def main():
 	rospy.init_node('central')
 
 	# Start time
-	tp = rospy.Publisher('~start_time', Time, latch=True)
-	tp.publish(rospy.Time.now())
+	tp = rospy.Publisher('/bc/start_time', Time, latch=True)
+	tp.publish(rospy.Time.from_sec(1560787942.84))
 
 	# Window duration
-	window_duration = rospy.get_param('~duration', 100)
-	wp = rospy.Publisher('~window_duration', Int32, latch=True)
+	#window_duration = rospy.get_param('~duration', 100)
+	window_duration = 1
+	wp = rospy.Publisher('/bc/window_duration', Int32, latch=True)
 	wp.publish(window_duration)
 
 	rospy.spin()

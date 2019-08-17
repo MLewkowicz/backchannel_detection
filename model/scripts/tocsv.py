@@ -16,9 +16,9 @@ def flatten_bundle(bundle):
 
 def main():
     # Get parameters
-    bundle_topic = rospy.get_param('~bundle_topic', '/bc/bundle')
-    src_bag_path = rospy.get_param('~source_bag_path', None)
-    csv_path = rospy.get_param('~csv_path')
+    bundle_topic = rospy.get_param('bundle_topic', '/bc/bundle')
+    src_bag_path = rospy.get_param('source_bag_path', None)
+    csv_path = rospy.get_param('csv_path')
 
     # Instantiate source
     if src_bag_path:

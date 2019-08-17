@@ -1,5 +1,5 @@
 <package format="2">
-  <name>audio_features</name>
+  <name>audio_features_detection</name>
   <version>0.0.0</version>
   <description>The audio_features package</description>
   <license>MIT</license>

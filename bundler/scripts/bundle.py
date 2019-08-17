@@ -6,7 +6,8 @@ from grouper import Combiner
 import rosbag
 from rospywrapper import TopicSource, BagSource, TopicSink, BagSink, Synchronizer
 
-from audio_features.msg import AudioFeatures
+from audio_features_detection.msg import AudioFeatures
+from nod_detection.msg import NodFeatures
 from bundler.msg import Bundle
 from std_msgs.msg import Header, Time, Int32
 
@@ -36,7 +37,7 @@ def main():
         nod_src = BagSource(nod_bag_path, nod_topic)
     else:
         # nod_src = TopicSource(nod_topic, NodFeature)
-        nod_src = TopicSource(nod_topic, AudioFeatures)
+        nod_src = TopicSource(nod_topic, NodFeatures)
     if start_time_bag_path:
         start_time_src = BagSource(start_time_bag_path, start_time_topic)
     else:

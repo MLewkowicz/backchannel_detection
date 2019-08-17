@@ -12,22 +12,37 @@
 		output="screen"
 	/>
 	<node
-		pkg="audio_features"
-		type="features.py"
+		pkg="audio_features_detection"
+		type="audio_features.py"
 		name="audio_features"
 		output="screen"
 	>
-		<param name="audio_topic" value="/mic/data" />
+		<param name="audio_topic" value="/pid1/chunk" />
 		<param name="features_topic" value="/bc/audio_features" />
+		<!-- param name="source_bag_path" value="~/data/AM/AM.bag" / -->
+		<!-- param name="sink_bag_path" value="~/data/AM/AM_audio_features.bag" / -->
 	</node>
 	<node
-		pkg="audio_features"
-		type="features.py"
+		pkg="nod_detection"
+		type="source.py"
 		name="nod_features"
 		output="screen"
 	>
-		<param name="audio_topic" value="/mic/data" />
+		<param name="nod_topic_camera1" value="/camera1/face_info" />
+		<param name="nod_topic_camera2" value="/camera2/face_info" />
+		<param name="nod_topic_camera3" value="/camera3/face_info" />
 		<param name="features_topic" value="/bc/nod_features" />
+	</node>
+	<node
+		pkg="gaze_detection"
+		type="gaze_features.py"
+		name="gaze_features"
+		output="screen"
+	>
+		<param name="gaze_topic_camera1" value="/camera1/face_info" />
+		<param name="gaze_topic_camera2" value="/camera2/face_info" />
+		<param name="gaze_topic_camera3" value="/camera3/face_info" />
+		<param name="features_topic" value="/bc/gaze_features" />
 	</node>
 	<node
 		pkg="bundler"
@@ -37,5 +52,14 @@
 	>
 		<param name="audio_topic" value="/bc/audio_features" />
 		<param name="nod_topic" value="/bc/nod_features" />
+	</node>
+	<node>
+		pkg="model"
+		type="tocsv.py"
+		name="bundle_to_csv"
+		output="screen"
+	>
+		<param name="bundle_topic" value="/bc/audio_features" />
+		<param name="csv_path" value="csv_path" />
 	</node>
 </launch>

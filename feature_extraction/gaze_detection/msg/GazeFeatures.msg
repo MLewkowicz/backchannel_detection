@@ -1,0 +1,10 @@
+std_msgs/Header header
+float32 angle_between_P1_P2
+float32 angle_between_P2_P1
+float32 angle_between_P1_P3
+float32 angle_between_P3_P1
+float32 angle_between_P3_P2
+float32 angle_between_P2_P3
+float32 angle_between_P1_Robot
+float32 angle_between_P2_Robot
+float32 angle_between_P3_Robot
